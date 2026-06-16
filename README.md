@@ -1,4 +1,4 @@
-# SmartSummarizer AI
+# Text Summarizer
 
 An NLP-powered text summarization tool that converts lengthy articles and documents into concise, easy-to-read key insights.
 
