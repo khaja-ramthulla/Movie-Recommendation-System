@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SmartSummarizer AI</title>
+
+<style>
+
+:root{
+    --bg:#f8fafc;
+    --card:#ffffff;
+    --text:#0f172a;
+    --muted:#64748b;
+    --border:#e2e8f0;
+    --accent:#2563eb;
+    --shadow:0 10px 30px rgba(0,0,0,.08);
+}
+
+.dark{
+    --bg:#020617;
+    --card:#0f172a;
+    --text:#f8fafc;
+    --muted:#94a3b8;
+    --border:#1e293b;
+    --shadow:0 10px 40px rgba(0,0,0,.35);
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Inter,Segoe UI,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    transition:.3s;
+    min-height:100vh;
+    padding:40px 20px;
+}
+
+.container{
+    max-width:1400px;
+    margin:auto;
+}
+
+.topbar{
+    display:flex;
+    justify-content:flex-end;
+    margin-bottom:20px;
+}
+
+.theme-btn{
+    background:var(--card);
+    color:var(--text);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:10px 16px;
+    cursor:pointer;
+}
+
+.hero{
+    text-align:center;
+    margin-bottom:40px;
+}
+
+.hero h1{
+    font-size:clamp(2.5rem,5vw,4rem);
+    margin-bottom:12px;
+}
+
+.hero p{
+    color:var(--muted);
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:25px;
+}
+
+.card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:24px;
+    padding:25px;
+    box-shadow:var(--shadow);
+}
+
+.card h2{
+    margin-bottom:15px;
+}
+
+textarea{
+    width:100%;
+    height:420px;
+    resize:none;
+    padding:18px;
+    border-radius:18px;
+    border:1px solid var(--border);
+    background:transparent;
+    color:var(--text);
+    outline:none;
+    font-size:15px;
+}
+
+.buttons{
+    display:flex;
+    gap:10px;
+    margin-top:16px;
+}
+
+button{
+    border:none;
+    cursor:pointer;
+    border-radius:12px;
+    padding:14px 18px;
+    font-weight:700;
+}
+
+.primary{
+    background:var(--accent);
+    color:white;
+}
+
+.secondary{
+    background:#e2e8f0;
+}
+
+.summary-box{
+    min-height:420px;
+}
+
+.insight{
+    background:rgba(37,99,235,.08);
+    border:1px solid rgba(37,99,235,.15);
+    border-radius:16px;
+    padding:15px;
+    margin-bottom:12px;
+    line-height:1.8;
+}
+
+.stats{
+    margin-top:25px;
+    display:grid;
+    grid-template-columns:
+    repeat(auto-fit,minmax(180px,1fr));
+    gap:15px;
+}
+
+.stat{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:18px;
+    text-align:center;
+    box-shadow:var(--shadow);
+}
+
+.stat h3{
+    font-size:1.7rem;
+    margin-bottom:6px;
+}
+
+.stat p{
+    color:var(--muted);
+}
+
+.loading{
+    display:none;
+    text-align:center;
+    margin-top:15px;
+    color:var(--muted);
+}
+
+.toast{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    background:#111827;
+    color:white;
+    padding:14px 20px;
+    border-radius:12px;
+    opacity:0;
+    pointer-events:none;
+    transition:.3s;
+}
+
+.toast.show{
+    opacity:1;
+}
+
+.footer{
+    margin-top:30px;
+    text-align:center;
+    color:var(--muted);
+}
+
+@media(max-width:900px){
+
+.grid{
+    grid-template-columns:1fr;
+}
+
+textarea{
+    height:300px;
+}
+
+.summary-box{
+    min-height:250px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="topbar">
+<button
+class="theme-btn"
+onclick="toggleTheme()">
+🌙 Toggle Theme
+</button>
+</div>
+
+<div class="hero">
+
+<h1>📝 SmartSummarizer AI</h1>
+
+<p>
+Turn lengthy articles into concise actionable insights.
+</p>
+
+</div>
+
+<div class="grid">
+
+<div class="card">
+
+<h2>Input Article</h2>
+
+<textarea
+id="inputText"
+placeholder="Paste your article here..."></textarea>
+
+<div class="buttons">
+
+<button
+class="primary"
+onclick="summarizeText()">
+
+Summarize
+</button>
+
+<button
+class="secondary"
+onclick="clearAll()">
+
+Clear
+</button>
+
+</div>
+
+<div
+id="loading"
+class="loading">
+
+Generating insights...
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>📌 Key Insights</h2>
+
+<div
+id="summary"
+class="summary-box">
+
+Paste an article and click
+"Summarize" to generate insights.
+
+</div>
+
+<div class="buttons">
+
+<button
+class="primary"
+onclick="copySummary()">
+
+Copy Summary
+</button>
+
+<button
+class="secondary"
+onclick="downloadSummary()">
+
+Download
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="stats">
+
+<div class="stat">
+<h3 id="originalWords">0</h3>
+<p>Original Words</p>
+</div>
+
+<div class="stat">
+<h3 id="summaryWords">0</h3>
+<p>Summary Words</p>
+</div>
+
+<div class="stat">
+<h3 id="compression">0%</h3>
+<p>Compression</p>
+</div>
+
+<div class="stat">
+<h3 id="qualityScore">0%</h3>
+<p>Quality Score</p>
+</div>
+
+<div class="stat">
+<h3 id="insightsCount">0</h3>
+<p>Key Insights</p>
+</div>
+
+<div class="stat">
+<h3 id="articleSize">-</h3>
+<p>Article Size</p>
+</div>
+
+<div class="stat">
+<h3 id="readingTime">0</h3>
+<p>Reading Time (mins)</p>
+</div>
+
+<div class="stat">
+<h3 id="timeSaved">0</h3>
+<p>Minutes Saved</p>
+</div>
+
+</div>
+
+<div class="footer">
+Built with Flask • Sumy • NLP
+</div>
+
+</div>
+
+<div
+id="toast"
+class="toast">
+Success
+</div>
+
+<script>
+
+function showToast(message){
+
+const toast =
+document.getElementById("toast");
+
+toast.innerText = message;
+
+toast.classList.add("show");
+
+setTimeout(()=>{
+
+toast.classList.remove("show");
+
+},2000);
+
+}
+
+function toggleTheme(){
+
+document.body.classList.toggle("dark");
+
+}
+
+async function summarizeText(){
+
+const text =
+document.getElementById(
+"inputText"
+).value.trim();
+
+if(text.length < 100){
+
+showToast(
+"Please enter a longer article."
+);
+
+return;
+}
+
+document.getElementById(
+"loading"
+).style.display =
+"block";
+
+const formData =
+new FormData();
+
+formData.append(
+"text",
+text
+);
+
+try{
+
+const response =
+await fetch(
+"/summarize",
+{
+method:"POST",
+body:formData
+}
+);
+
+const data =
+await response.json();
+
+document.getElementById(
+"loading"
+).style.display =
+"none";
+
+if(data.error){
+
+showToast(data.error);
+return;
+}
+
+let html = "";
+
+data.summary.forEach((point,index)=>{
+
+html += `
+<div class="insight">
+<strong>📌 Insight ${index+1}</strong><br><br>
+${point}
+</div>
+`;
+
+});
+
+document.getElementById(
+"summary"
+).innerHTML =
+html;
+
+document.getElementById(
+"originalWords"
+).innerText =
+data.original_words;
+
+document.getElementById(
+"summaryWords"
+).innerText =
+data.summary_words;
+
+document.getElementById(
+"compression"
+).innerText =
+data.compression + "%";
+
+document.getElementById(
+"qualityScore"
+).innerText =
+data.quality_score + "%";
+
+document.getElementById(
+"insightsCount"
+).innerText =
+data.insights_count;
+
+document.getElementById(
+"articleSize"
+).innerText =
+data.article_size;
+
+document.getElementById(
+"readingTime"
+).innerText =
+data.reading_time_original;
+
+document.getElementById(
+"timeSaved"
+).innerText =
+data.time_saved;
+
+showToast(
+"Summary generated!"
+);
+
+}
+catch(error){
+
+document.getElementById(
+"loading"
+).style.display =
+"none";
+
+showToast(
+"Something went wrong."
+);
+
+console.error(error);
+
+}
+
+}
+
+function clearAll(){
+
+document.getElementById(
+"inputText"
+).value = "";
+
+location.reload();
+
+}
+
+function copySummary(){
+
+const text =
+document.getElementById(
+"summary"
+).innerText;
+
+navigator.clipboard.writeText(
+text
+);
+
+showToast(
+"Summary copied!"
+);
+
+}
+
+function downloadSummary(){
+
+const text =
+document.getElementById(
+"summary"
+).innerText;
+
+const blob =
+new Blob(
+[text],
+{type:"text/plain"}
+);
+
+const a =
+document.createElement("a");
+
+a.href =
+URL.createObjectURL(blob);
+
+a.download =
+"summary.txt";
+
+a.click();
+
+showToast(
+"Summary downloaded!"
+);
+
+}
+
+</script>
+
+</body>
+</html>
